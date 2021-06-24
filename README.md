@@ -2,12 +2,12 @@
 Bash script to restart the ZTE SpeedPort Entry 2i modem from terminal.
 
 ## Configuration 
-User's credentials and modem's ip address are required in order to execute the script
+User's credentials and modem's ip address are required in order to execute the script.
 
 
 ### Credentials
 
-Username and password are stored in the credentials file
+Username and password are stored in the credentials file.
 
 ```bash
 username=<username>
