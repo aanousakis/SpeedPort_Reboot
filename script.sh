@@ -2,10 +2,10 @@
 
 router_ip='http://192.168.1.1'
 
-username=$(grep -w 'username' credentials |  sed 's_username=__'  )
+username=$(grep -w 'username' credentials.txt |  sed 's_username=__'  )
 echo "username = $username"
 
-password=$(grep -w 'password' credentials |  sed 's_password=__'  )
+password=$(grep -w 'password' credentials.txt |  sed 's_password=__'  )
 echo "password = $password"
 
 

@@ -7,7 +7,7 @@ User's credentials and modem's ip address are required in order to execute the s
 
 ### Credentials
 
-Username and password are stored in the credentials file.
+Username and password are stored in the credentials.txt file.
 
 ```bash
 username=<username>
