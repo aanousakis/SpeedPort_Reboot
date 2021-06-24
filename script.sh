@@ -112,7 +112,7 @@ echo "session_token = $session_tokken"
 
 ###  post reboot request
 
-curl "$router_ip/common_page/deviceManag_lua.lua" \
+curl --max-time 5 "$router_ip/common_page/deviceManag_lua.lua" \
     -H 'User-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0' \
     -H 'Accept: application/xml, text/xml, */*; q=0.01' \
     -H 'Accept-Language: en-US,en;q=0.5' \
@@ -127,3 +127,7 @@ curl "$router_ip/common_page/deviceManag_lua.lua" \
     -H 'Sec-GPC: 1' \
     --data-raw "IF_ACTION=Restart&Btn_restart=&_sessionTOKEN=$session_tokken"  > reboot.html
 
+
+### exit
+
+exit 0
