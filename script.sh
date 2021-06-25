@@ -3,16 +3,16 @@
 router_ip='http://192.168.1.1'
 
 username=$(grep -w 'username' credentials.txt |  sed 's_username=__'  )
-echo "username = $username"
+#echo "username = $username"
 
 password=$(grep -w 'password' credentials.txt |  sed 's_password=__'  )
-echo "password = $password"
+#echo "password = $password"
 
 
 
 ####  open login page
 
-curl "$router_ip" \
+curl -c cookies.txt "$router_ip" \
     -H 'User-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0' \
     -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' \
     -H 'Accept-Language: en-US,en;q=0.5' \
@@ -20,29 +20,27 @@ curl "$router_ip" \
     -H "Referer: \"$router_ip\"/" \
     -H 'DNT: 1'\
     -H 'Connection: keep-alive' \
-    -H 'Cookie: _TESTCOOKIESUPPORT=1; SID=3a8902b989845b4f50f9693635bf8de21ae3f5bdb7fce58bc217512be7494e68'\
     -H 'Upgrade-Insecure-Requests: 1'\
     -H 'Sec-GPC: 1' \
-    -H 'Cache-Control: max-age=0' > login.html
+    -H 'Cache-Control: max-age=0'   >  /dev/null
 
 
 ###  extract xmlobject number
 
 xmlobject=$(curl "$router_ip"/function_module/login_module/login_page/logintoken_lua.lua?_=1624531066102   | sed 's_<ajax\_response\_xml\_root>__'  | sed 's_</ajax\_response\_xml\_root>__' )
-
-echo "xmlobject = $xmlobject"
+#echo "xmlobject = $xmlobject"
 
 
 ###  create password
 
-echo  "${password}${xmlobject}"
+#echo  "${password}${xmlobject}"
 password_sha256=$(echo -n "${password}${xmlobject}" |  sha256sum  | head -c 64)
-echo "password_sha256 = $password_sha256"
+#echo "password_sha256 = $password_sha256"
 
 
 ###   post login request
 
-curl "$router_ip" \
+curl -b cookies.txt "$router_ip" \
     -H 'User-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0' \
     -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' \
     -H 'Accept-Language: en-US,en;q=0.5' \
@@ -52,15 +50,13 @@ curl "$router_ip" \
     -H 'DNT: 1' \
     -H 'Connection: keep-alive' \
     -H "Referer: \"$router_ip\"/" \
-    -H 'Cookie: _TESTCOOKIESUPPORT=1; SID=3a8902b989845b4f50f9693635bf8de21ae3f5bdb7fce58bc217512be7494e68' \
     -H 'Upgrade-Insecure-Requests: 1' \
     -H 'Sec-GPC: 1' \
-    --data-raw "Username=admin&Password=$password_sha256&action=login"  > post_login.html
-
+    --data-raw "Username=$username&Password=$password_sha256&action=login"  > /dev/null
 
 ###  open main page
 
-curl 'http://192.168.1.1/' \
+curl -b cookies.txt 'http://192.168.1.1/' \
     -H 'User-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0' \
     -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' \
     -H 'Accept-Language: en-US,en;q=0.5' \
@@ -68,14 +64,13 @@ curl 'http://192.168.1.1/' \
     -H "Referer: \"$router_ip\"/" \
     -H 'DNT: 1' \
     -H 'Connection: keep-alive' \
-    -H 'Cookie: _TESTCOOKIESUPPORT=1; SID=3a8902b989845b4f50f9693635bf8de21ae3f5bdb7fce58bc217512be7494e68' \
     -H 'Upgrade-Insecure-Requests: 1' \
     -H 'Sec-GPC: 1' \
-    -H 'Cache-Control: max-age=0'  > main_menu.html
+    -H 'Cache-Control: max-age=0'     > /dev/null
 
 ###  select Managment tab
 
-curl "$router_ip/getpage.lua?pid=123&nextpage=ManagDiag_StatusManag_t.lp&Menu3Location=0&_=1624535491068" \
+curl -b cookies.txt "$router_ip/getpage.lua?pid=123&nextpage=ManagDiag_StatusManag_t.lp&Menu3Location=0&_=1624535491068" \
     -H 'User-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0' \
     -H 'Accept: text/html, */*; q=0.01' \
     -H 'Accept-Language: en-US,en;q=0.5' \
@@ -84,13 +79,11 @@ curl "$router_ip/getpage.lua?pid=123&nextpage=ManagDiag_StatusManag_t.lp&Menu3Lo
     -H 'DNT: 1' \
     -H 'Connection: keep-alive' \
     -H "Referer: \"$router_ip\"/" \
-    -H 'Cookie: SID=3a8902b989845b4f50f9693635bf8de21ae3f5bdb7fce58bc217512be7494e68; _TESTCOOKIESUPPORT=1' \
-    -H 'Sec-GPC: 1'  > menu1.html
-
+    -H 'Sec-GPC: 1'      > /dev/null
 
 ###  select system managment
 
-curl "$router_ip/getpage.lua?pid=123&nextpage=ManagDiag_DeviceManag_t.lp&Menu3Location=0&_=1624535573870" \
+curl -b cookies.txt "$router_ip/getpage.lua?pid=123&nextpage=ManagDiag_DeviceManag_t.lp&Menu3Location=0&_=1624535573870" \
     -H 'User-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0' \
     -H 'Accept: text/html, */*; q=0.01' \
     -H 'Accept-Language: en-US,en;q=0.5' \
@@ -99,20 +92,18 @@ curl "$router_ip/getpage.lua?pid=123&nextpage=ManagDiag_DeviceManag_t.lp&Menu3Lo
     -H 'DNT: 1' \
     -H 'Connection: keep-alive' \
     -H "Referer: \"$router_ip\"/" \
-    -H 'Cookie: SID=3a8902b989845b4f50f9693635bf8de21ae3f5bdb7fce58bc217512be7494e68; _TESTCOOKIESUPPORT=1' \
-    -H 'Sec-GPC: 1'  > menu2.html
+    -H 'Sec-GPC: 1'  > /tmp/menu2.html
 
 ### extract session token from index.html page
 
-grep -w '_sessionTmpToken' menu2.html | tail -1
 
-session_tokken=$(grep -w '_sessionTmpToken' menu2.html | tail -1 |  sed 's_\_sessionTmpToken = __' | sed 's_"__g' |  sed 's_\\x3__g' | sed 's/.$//')
-echo "session_token = $session_tokken"
+session_tokken=$(grep -w '_sessionTmpToken' /tmp/menu2.html | tail -1 |  sed 's_\_sessionTmpToken = __' | sed 's_"__g' |  sed 's_\\x3__g' | sed 's/.$//')
+#echo "session_token = $session_tokken"
 
 
 ###  post reboot request
 
-curl --max-time 5 "$router_ip/common_page/deviceManag_lua.lua" \
+curl -b cookies.txt --max-time 2 "$router_ip/common_page/deviceManag_lua.lua" \
     -H 'User-Agent: Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0' \
     -H 'Accept: application/xml, text/xml, */*; q=0.01' \
     -H 'Accept-Language: en-US,en;q=0.5' \
@@ -123,9 +114,8 @@ curl --max-time 5 "$router_ip/common_page/deviceManag_lua.lua" \
     -H 'DNT: 1' \
     -H 'Connection: keep-alive' \
     -H "Referer: \"$router_ip\"/" \
-    -H 'Cookie: _TESTCOOKIESUPPORT=1; SID=3a8902b989845b4f50f9693635bf8de21ae3f5bdb7fce58bc217512be7494e68' \
     -H 'Sec-GPC: 1' \
-    --data-raw "IF_ACTION=Restart&Btn_restart=&_sessionTOKEN=$session_tokken"  > reboot.html
+    --data-raw "IF_ACTION=Restart&Btn_restart=&_sessionTOKEN=$session_tokken"  > /dev/null
 
 
 ### exit
